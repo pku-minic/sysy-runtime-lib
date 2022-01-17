@@ -4,6 +4,9 @@ ADD_CFLAGS ?=
 
 # C compiler
 CFLAGS := -O3 -c
+ifneq ($(NO_LIBC), 0)
+CFLAGS += -DNO_LIBC
+endif
 CC := clang $(CFLAGS) $(ADD_CFLAGS)
 
 # archiver
@@ -37,4 +40,4 @@ $(LIBSYSY): $(OBJS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	mkdir -p $(dir $@)
-	$(CC) $^ -o $@
+	$(CC) $^ -o $@ -I$(SRC_DIR)
