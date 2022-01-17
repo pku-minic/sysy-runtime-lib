@@ -3,7 +3,7 @@ NO_LIBC ?= 0
 ADD_CFLAGS ?=
 
 # C compiler
-CFLAGS := -O3 -c
+CFLAGS := -O3 -c -Wall -Werror
 ifneq ($(NO_LIBC), 0)
 CFLAGS += -DNO_LIBC
 endif
