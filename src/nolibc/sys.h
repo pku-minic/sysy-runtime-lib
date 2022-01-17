@@ -34,10 +34,10 @@
 #define SYS_EXIT 60
 #define SYS_GETTIMEOFDAY 96
 #else
-#define SYS_READ (0x20000000 | 3)
-#define SYS_WRITE (0x20000000 | 4)
-#define SYS_EXIT (0x20000000 | 1)
-#define SYS_GETTIMEOFDAY (0x20000000 | 116)
+#define SYS_READ (0x2000000 | 3)
+#define SYS_WRITE (0x2000000 | 4)
+#define SYS_EXIT (0x2000000 | 1)
+#define SYS_GETTIMEOFDAY (0x2000000 | 116)
 #endif
 
 #ifdef SYS_X86_64
