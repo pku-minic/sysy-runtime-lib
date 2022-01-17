@@ -7,9 +7,9 @@
 
 // Input & output functions
 int getint(), getch(), getarray(int a[]);
-void putint(int a), putch(int a), putarray(int n, int a[]);
+void putint(int num), putch(int ch), putarray(int n, int a[]);
 
-// Timing function implementation
+// Timing functions
 void starttime();
 void stoptime();
 
