@@ -2,6 +2,7 @@
 
 #ifdef NO_LIBC
 #include "nolibc/io.h"
+#include "nolibc/time.h"
 #else
 #include <sys/time.h>
 #include <unistd.h>
@@ -82,7 +83,7 @@ int getch() {
   }
   else {
     // char buffer is not valid, read char from stdin
-    char c;
+    char c = '\0';
     read(STDIN_FILENO, &c, 1);
     return c;
   }
