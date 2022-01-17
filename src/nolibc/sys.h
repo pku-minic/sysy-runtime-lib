@@ -31,14 +31,27 @@
 #ifdef SYS_LINUX
 #define SYS_READ 0
 #define SYS_WRITE 1
+#define SYS_EXIT 60
 #define SYS_GETTIMEOFDAY 96
 #else
 #define SYS_READ (0x20000000 | 3)
 #define SYS_WRITE (0x20000000 | 4)
+#define SYS_EXIT (0x20000000 | 1)
 #define SYS_GETTIMEOFDAY (0x20000000 | 116)
 #endif
 
 #ifdef SYS_X86_64
+#define SYSCALL1(number, arg0)                            \
+  ({                                                      \
+    unsigned long int resultvar;                          \
+    unsigned long int __arg0 = (unsigned long int)(arg0); \
+    register unsigned long int _a0 asm("rdi") = __arg0;   \
+    asm volatile("syscall\n\t"                            \
+                 : "=a"(resultvar)                        \
+                 : "0"(number), "r"(_a0)                  \
+                 : "memory", "cc", "r11", "cx");          \
+    (long int)resultvar;                                  \
+  })
 #define SYSCALL2(number, arg0, arg1)                      \
   ({                                                      \
     unsigned long int resultvar;                          \
@@ -68,6 +81,17 @@
     (long int)resultvar;                                     \
   })
 #else
+#define SYSCALL1(number, arg0)                                         \
+  ({                                                                   \
+    long int _sys_result;                                              \
+    long int _arg0 = (long int)(arg0);                                 \
+                                                                       \
+    register long int __a7 asm("a7") = number;                         \
+    register long int __a0 asm("a0") = _arg0;                          \
+    __asm__ volatile("scall\n\t" : "+r"(__a0) : "r"(__a7) : "memory"); \
+    _sys_result = __a0;                                                \
+    _sys_result;                                                       \
+  })
 #define SYSCALL2(number, arg0, arg1)           \
   ({                                           \
     long int _sys_result;                      \
