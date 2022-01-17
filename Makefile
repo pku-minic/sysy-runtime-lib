@@ -33,6 +33,7 @@ OBJS := $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
 # targets
 LIBSYSY := $(BUILD_DIR)/libsysy.a
 
+
 $(LIBSYSY): $(OBJS)
 	mkdir -p $(dir $@)
 	$(AR) $@ $^
@@ -41,3 +42,8 @@ $(LIBSYSY): $(OBJS)
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	mkdir -p $(dir $@)
 	$(CC) $^ -o $@ -I$(SRC_DIR)
+
+.PHONY: clean
+clean:
+	-rm -rf $(OBJ_DIR)
+	-rm $(LIBSYSY)
