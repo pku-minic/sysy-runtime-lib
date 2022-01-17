@@ -5,7 +5,10 @@ ADD_CFLAGS ?=
 # C compiler
 CFLAGS := -O3 -Wall -Werror
 ifneq ($(NO_LIBC), 0)
-CFLAGS += -DNO_LIBC -nostdlib -nostdinc -static
+CFLAGS += -DNO_LIBC
+ifneq ($(shell uname), Darwin)
+CFLAGS += -nostdlib -nostdinc -static
+endif
 endif
 CC := clang $(CFLAGS) $(ADD_CFLAGS)
 
