@@ -1,5 +1,5 @@
-#ifndef SYSY_H_
-#define SYSY_H_
+#ifndef LIBSYSY_SYSY_H_
+#define LIBSYSY_SYSY_H_
 
 // SysY runtime library.
 // Reference: https://bit.ly/3tzTFks
@@ -13,4 +13,4 @@ void putint(int a), putch(int a), putarray(int n, int a[]);
 void starttime();
 void stoptime();
 
-#endif  // SYSY_H_
+#endif  // LIBSYSY_SYSY_H_
