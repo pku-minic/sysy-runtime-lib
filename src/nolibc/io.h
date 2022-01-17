@@ -8,7 +8,7 @@
 #define STDOUT_FILENO 1
 #define STDERR_FILENO 2
 
-static inline ssize_t read(int fd, const void *buf, size_t nbytes) {
+static inline ssize_t read(int fd, void *buf, size_t nbytes) {
   return SYSCALL3(SYS_READ, fd, buf, nbytes);
 }
 
