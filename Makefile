@@ -1,9 +1,11 @@
 # parameters
 NO_LIBC ?= 0
 ADD_CFLAGS ?=
+LIB_OPT ?= -O3
+TEST_OPT ?= -O1
 
 # C compiler
-CFLAGS := -O3 -Wall -Werror
+CFLAGS := -Wall -Werror
 ifneq ($(NO_LIBC), 0)
 CFLAGS += -DNO_LIBC
 ifneq ($(shell uname), Darwin)
@@ -56,8 +58,8 @@ $(LIBSYSY): $(OBJS)
 	$(RANLIB) $@
 
 $(TEST): $(LIBSYSY) $(TEST_SRC)
-	$(CC) $(TEST_SRC) -o $@ -I$(SRC_DIR) -L$(BUILD_DIR) -lsysy
+	$(CC) $(TEST_SRC) -o $@ -I$(SRC_DIR) -L$(BUILD_DIR) -lsysy $(TEST_OPT)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	mkdir -p $(dir $@)
-	$(CC) $^ -o $@ -I$(SRC_DIR) -c
+	$(CC) $^ -o $@ -I$(SRC_DIR) -c $(LIB_OPT)
