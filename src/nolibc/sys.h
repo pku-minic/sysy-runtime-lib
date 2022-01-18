@@ -29,10 +29,17 @@
 #endif
 
 #ifdef SYS_LINUX
+#ifdef SYS_X86_64
 #define SYS_READ 0
 #define SYS_WRITE 1
 #define SYS_EXIT 60
 #define SYS_GETTIMEOFDAY 96
+#else
+#define SYS_READ 63
+#define SYS_WRITE 64
+#define SYS_EXIT 93
+#define SYS_GETTIMEOFDAY 169
+#endif
 #else
 #define SYS_READ (0x2000000 | 3)
 #define SYS_WRITE (0x2000000 | 4)
