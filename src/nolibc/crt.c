@@ -1,10 +1,14 @@
 #include "nolibc/sys.h"
 #include "nolibc/types.h"
 
+extern void before_main();
 extern int main();
+extern void after_main();
 
 void _start() {
+  before_main();
   int ret = main();
+  after_main();
   SYSCALL1(SYS_EXIT, ret);
 }
 
