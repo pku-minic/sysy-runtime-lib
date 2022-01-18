@@ -56,7 +56,7 @@ $(LIBSYSY): $(OBJS)
 	$(RANLIB) $@
 
 $(TEST): $(LIBSYSY) $(TEST_SRC)
-	$(CC) $^ -o $@ -I$(SRC_DIR) -L$(BUILD_DIR) -lsysy
+	$(CC) $(TEST_SRC) -o $@ -I$(SRC_DIR) -L$(BUILD_DIR) -lsysy
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	mkdir -p $(dir $@)
