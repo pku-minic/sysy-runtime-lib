@@ -20,7 +20,7 @@
 static char last_char;
 static int last_char_valid = 0;
 
-static void PutChar(int fd, char c) { write(STDOUT_FILENO, &c, 1); }
+static void PutChar(int fd, char c) { write(fd, &c, 1); }
 
 static void PutString(int fd, const char *str) {
   for (int i = 0; str[i]; ++i) PutChar(fd, str[i]);
