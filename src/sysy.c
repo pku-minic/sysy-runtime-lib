@@ -117,16 +117,10 @@ void putarray(int n, int a[]) {
 static struct timeval timer_start, timer_end;
 static int timer_h[TIMER_COUNT_MAX], timer_m[TIMER_COUNT_MAX],
     timer_s[TIMER_COUNT_MAX], timer_us[TIMER_COUNT_MAX];
-static int timer_idx;
-
-void __attribute((constructor)) before_main() {
-  for (int i = 0; i < TIMER_COUNT_MAX; i++) {
-    timer_h[i] = timer_m[i] = timer_s[i] = timer_us[i] = 0;
-  }
-  timer_idx = 1;
-}
+static int timer_idx = 1;
 
 void __attribute((destructor)) after_main() {
+  if (timer_idx <= 1) return;
   for (int i = 1; i < timer_idx; i++) {
     PutString(STDERR_FILENO, "Timer: ");
     PutInt(STDERR_FILENO, timer_h[i]);
