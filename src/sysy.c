@@ -17,7 +17,7 @@
   ((c) == ' ' || (c) == '\f' || (c) == '\n' || (c) == '\r' || \
    (c) == '\t' || (c) == '\v')
 
-static char last_char;
+static int last_char;
 static int last_char_valid = 0;
 
 #define OUTPUT_BUFFER_SIZE 1024
@@ -75,7 +75,7 @@ static void PutInt(int fd, int num) {
 
 int getint() {
   // skip spaces
-  char c = getch();
+  int c = getch();
   while (IS_SPACE(c)) c = getch();
   // check if is a negative integer
   int is_neg = 0;
@@ -102,9 +102,8 @@ int getch() {
   }
   else {
     // char buffer is not valid, read char from stdin
-    char c = '\0';
-    read(STDIN_FILENO, &c, 1);
-    return c;
+    char c;
+    return read(STDIN_FILENO, &c, 1) == 1 ? c : -1;
   }
 }
 
