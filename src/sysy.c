@@ -20,7 +20,26 @@
 static char last_char;
 static int last_char_valid = 0;
 
-static void PutChar(int fd, char c) { write(fd, &c, 1); }
+#define OUTPUT_BUFFER_SIZE 1024
+static char output_buffer[OUTPUT_BUFFER_SIZE];
+static size_t output_buffer_index = 0;
+
+static void write_buffer(int fd, const void *buffer, size_t size) {
+  if (fd == STDERR_FILENO) {
+    write(fd, buffer, size);
+  }
+  else {
+    if (output_buffer_index + size > OUTPUT_BUFFER_SIZE) {
+      write(fd, output_buffer, output_buffer_index);
+      output_buffer_index = 0;
+    }
+    for (size_t i = 0; i < size; i++) {
+      output_buffer[output_buffer_index++] = ((char *)buffer)[i];
+    }
+  }
+}
+
+static void PutChar(int fd, char c) { write_buffer(fd, &c, 1); }
 
 static void PutString(int fd, const char *str) {
   for (int i = 0; str[i]; ++i) PutChar(fd, str[i]);
@@ -47,7 +66,7 @@ static void PutInt(int fd, int num) {
     }
   }
   // write string to stdout
-  write(fd, digits + i, 20 - i);
+  write_buffer(fd, digits + i, 20 - i);
 }
 
 // ============================================================
@@ -120,6 +139,9 @@ static int timer_h[TIMER_COUNT_MAX], timer_m[TIMER_COUNT_MAX],
 static int timer_idx = 1;
 
 void __attribute((destructor)) after_main() {
+  // clear output buffer
+  write(STDOUT_FILENO, output_buffer, output_buffer_index);
+  // print timing results
   if (timer_idx <= 1) return;
   for (int i = 1; i < timer_idx; i++) {
     PutString(STDERR_FILENO, "Timer: ");
