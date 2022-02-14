@@ -24,22 +24,29 @@ static int last_char_valid = 0;
 static char output_buffer[OUTPUT_BUFFER_SIZE];
 static size_t output_buffer_index = 0;
 
+static void flush_buffer(int fd) {
+  if (output_buffer_index > 0) {
+    write(fd, output_buffer, output_buffer_index);
+    output_buffer_index = 0;
+  }
+}
+
 static void write_buffer(int fd, const void *buffer, size_t size) {
   if (fd == STDERR_FILENO) {
     write(fd, buffer, size);
   }
   else {
-    if (output_buffer_index + size > OUTPUT_BUFFER_SIZE) {
-      write(fd, output_buffer, output_buffer_index);
-      output_buffer_index = 0;
-    }
+    if (output_buffer_index + size > OUTPUT_BUFFER_SIZE) flush_buffer(fd);
     for (size_t i = 0; i < size; i++) {
       output_buffer[output_buffer_index++] = ((char *)buffer)[i];
     }
   }
 }
 
-static void PutChar(int fd, char c) { write_buffer(fd, &c, 1); }
+static void PutChar(int fd, char c) {
+  write_buffer(fd, &c, 1);
+  if (c == '\n') flush_buffer(fd);
+}
 
 static void PutString(int fd, const char *str) {
   for (int i = 0; str[i]; ++i) PutChar(fd, str[i]);
