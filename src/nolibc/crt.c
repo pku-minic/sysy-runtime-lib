@@ -10,10 +10,15 @@ void _start() {
   SYSCALL1(SYS_EXIT, ret);
 }
 
-void *memset(void *s, int c, size_t len) {
-  unsigned char *p = s;
-  while (len--) {
-    *p++ = (unsigned char)c;
-  }
-  return s;
+void *memset(void *dest, int c, size_t n) {
+  unsigned char *p = dest;
+  while (n--) *p++ = (unsigned char)c;
+  return dest;
+}
+
+void *memcpy(void *dest, const void *src, size_t n) {
+  char *d = dest;
+  const char *s = src;
+  while (n--) *d++ = *s++;
+  return dest;
 }
