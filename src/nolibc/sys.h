@@ -21,7 +21,7 @@
 #ifdef SYS_RISCV
 #if __riscv_xlen == 32
 #define SYS_32
-#elif __risv_xlen == 64
+#elif __riscv_xlen == 64
 #define SYS_64
 #else
 #error "supports only 32-bit or 64-bit RISC-V targets"
