@@ -5,7 +5,7 @@ LIB_OPT ?= -O3
 TEST_OPT ?= -O1
 
 # C compiler
-CFLAGS := -Wall -Werror
+CFLAGS := -Wall -Werror -Wno-unused-result
 ifneq ($(NO_LIBC), 0)
 CFLAGS += -DNO_LIBC
 ifneq ($(shell uname), Darwin)
