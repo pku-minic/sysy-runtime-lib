@@ -15,6 +15,6 @@ make
 
 The output (`libsysy.a`) will be generated in directory `build`.
 
-## License
+## Copyright and License
 
-Copyright (C) 2010-2022 MaxXing. License GPLv3.
+Copyright (C) 2022-2024 MaxXing. License GPLv3.
