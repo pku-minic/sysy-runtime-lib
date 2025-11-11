@@ -101,19 +101,16 @@
   })
 #elif defined(SYS_AARCH64)
 #ifdef SYS_LINUX
-#define SYSCALL1(number, arg0)              \
-  ({                                        \
-    long _sys_result;                       \
-    long _x0tmp = (long)(arg0);             \
-    register long _x0 asm("x0");            \
-    _x0 = _x0tmp;                           \
-    register long _x8 asm("x8") = (number); \
-    asm volatile("svc 0\n\t"                \
-                 : "=r"(_x0)                \
-                 : "r"(_x8), "r"(_x0)       \
-                 : "memory");               \
-    _sys_result = _x0;                      \
-    _sys_result;                            \
+#define SYSCALL1(number, arg0)                                             \
+  ({                                                                       \
+    long _sys_result;                                                      \
+    long _x0tmp = (long)(arg0);                                            \
+    register long _x0 asm("x0");                                           \
+    _x0 = _x0tmp;                                                          \
+    register long _x8 asm("x8") = (number);                                \
+    asm volatile("svc 0\n\t" : "=r"(_x0) : "r"(_x8), "r"(_x0) : "memory"); \
+    _sys_result = _x0;                                                     \
+    _sys_result;                                                           \
   })
 #define SYSCALL2(number, arg0, arg1)            \
   ({                                            \
@@ -150,19 +147,16 @@
     _sys_result;                                          \
   })
 #else  // macOS.
-#define SYSCALL1(number, arg0)               \
-  ({                                         \
-    long _sys_result;                        \
-    long _x0tmp = (long)(arg0);              \
-    register long _x0 asm("x0");             \
-    _x0 = _x0tmp;                            \
-    register long _x8 asm("x16") = (number); \
-    asm volatile("svc 0x80\n\t"              \
-                 : "=r"(_x0)                 \
-                 : "r"(_x8), "r"(_x0)        \
-                 : "memory");                \
-    _sys_result = _x0;                       \
-    _sys_result;                             \
+#define SYSCALL1(number, arg0)                                                \
+  ({                                                                          \
+    long _sys_result;                                                         \
+    long _x0tmp = (long)(arg0);                                               \
+    register long _x0 asm("x0");                                              \
+    _x0 = _x0tmp;                                                             \
+    register long _x8 asm("x16") = (number);                                  \
+    asm volatile("svc 0x80\n\t" : "=r"(_x0) : "r"(_x8), "r"(_x0) : "memory"); \
+    _sys_result = _x0;                                                        \
+    _sys_result;                                                              \
   })
 #define SYSCALL2(number, arg0, arg1)            \
   ({                                            \
@@ -210,20 +204,17 @@
     _sys_result = __a0;                                            \
     _sys_result;                                                   \
   })
-#define SYSCALL2(number, arg0, arg1)           \
-  ({                                           \
-    long int _sys_result;                      \
-    long int _arg0 = (long int)(arg0);         \
-    long int _arg1 = (long int)(arg1);         \
-    register long int __a7 asm("a7") = number; \
-    register long int __a0 asm("a0") = _arg0;  \
-    register long int __a1 asm("a1") = _arg1;  \
-    asm volatile("ecall\n\t"                   \
-                 : "+r"(__a0)                  \
-                 : "r"(__a7), "r"(__a1)        \
-                 : "memory");                  \
-    _sys_result = __a0;                        \
-    _sys_result;                               \
+#define SYSCALL2(number, arg0, arg1)                                          \
+  ({                                                                          \
+    long int _sys_result;                                                     \
+    long int _arg0 = (long int)(arg0);                                        \
+    long int _arg1 = (long int)(arg1);                                        \
+    register long int __a7 asm("a7") = number;                                \
+    register long int __a0 asm("a0") = _arg0;                                 \
+    register long int __a1 asm("a1") = _arg1;                                 \
+    asm volatile("ecall\n\t" : "+r"(__a0) : "r"(__a7), "r"(__a1) : "memory"); \
+    _sys_result = __a0;                                                       \
+    _sys_result;                                                              \
   })
 #define SYSCALL3(number, arg0, arg1, arg2)         \
   ({                                               \

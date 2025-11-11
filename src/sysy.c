@@ -13,9 +13,9 @@
 // ============================================================
 
 #define IS_DIGIT(c) ((c) >= '0' && (c) <= '9')
-#define IS_SPACE(c)                                           \
-  ((c) == ' ' || (c) == '\f' || (c) == '\n' || (c) == '\r' || \
-   (c) == '\t' || (c) == '\v')
+#define IS_SPACE(c)                                                          \
+  ((c) == ' ' || (c) == '\f' || (c) == '\n' || (c) == '\r' || (c) == '\t' || \
+   (c) == '\v')
 
 static int last_char;
 static int last_char_valid = 0;
@@ -34,8 +34,7 @@ static void flush_buffer(int fd) {
 static void write_buffer(int fd, const void *buffer, size_t size) {
   if (fd == STDERR_FILENO) {
     write(fd, buffer, size);
-  }
-  else {
+  } else {
     if (output_buffer_index + size > OUTPUT_BUFFER_SIZE) flush_buffer(fd);
     for (size_t i = 0; i < size; i++) {
       output_buffer[output_buffer_index++] = ((char *)buffer)[i];
@@ -43,16 +42,16 @@ static void write_buffer(int fd, const void *buffer, size_t size) {
   }
 }
 
-static void PutChar(int fd, char c) {
+static void put_char_buffered(int fd, char c) {
   write_buffer(fd, &c, 1);
   if (c == '\n') flush_buffer(fd);
 }
 
-static void PutString(int fd, const char *str) {
-  for (int i = 0; str[i]; ++i) PutChar(fd, str[i]);
+static void put_string_buffered(int fd, const char *str) {
+  for (int i = 0; str[i]; ++i) put_char_buffered(fd, str[i]);
 }
 
-static void PutInt(int fd, int num) {
+static void put_int_buffered(int fd, int num) {
   // check if is a negative integer
   if (num < 0) {
     putch('-');
@@ -64,8 +63,7 @@ static void PutInt(int fd, int num) {
   if (!num) {
     i = 19;
     digits[19] = '0';
-  }
-  else {
+  } else {
     while (num) {
       i -= 1;
       digits[i] = (num % 10) + '0';
@@ -106,8 +104,7 @@ int getch() {
     // char buffer is valid, consume the char in it
     last_char_valid = 0;
     return last_char;
-  }
-  else {
+  } else {
     // char buffer is not valid, read char from stdin
     char c;
     return read(STDIN_FILENO, &c, 1) == 1 ? c : -1;
@@ -120,9 +117,9 @@ int getarray(int a[]) {
   return n;
 }
 
-void putint(int num) { PutInt(STDOUT_FILENO, num); }
+void putint(int num) { put_int_buffered(STDOUT_FILENO, num); }
 
-void putch(int ch) { PutChar(STDOUT_FILENO, ch); }
+void putch(int ch) { put_char_buffered(STDOUT_FILENO, ch); }
 
 void putarray(int n, int a[]) {
   putint(n);
@@ -150,15 +147,15 @@ void __attribute((destructor)) after_main() {
   // print timing results
   if (timer_idx <= 1) return;
   for (int i = 1; i < timer_idx; i++) {
-    PutString(STDERR_FILENO, "Timer: ");
-    PutInt(STDERR_FILENO, timer_h[i]);
-    PutString(STDERR_FILENO, "H-");
-    PutInt(STDERR_FILENO, timer_m[i]);
-    PutString(STDERR_FILENO, "M-");
-    PutInt(STDERR_FILENO, timer_s[i]);
-    PutString(STDERR_FILENO, "S-");
-    PutInt(STDERR_FILENO, timer_us[i]);
-    PutString(STDERR_FILENO, "us\n");
+    put_string_buffered(STDERR_FILENO, "Timer: ");
+    put_int_buffered(STDERR_FILENO, timer_h[i]);
+    put_string_buffered(STDERR_FILENO, "H-");
+    put_int_buffered(STDERR_FILENO, timer_m[i]);
+    put_string_buffered(STDERR_FILENO, "M-");
+    put_int_buffered(STDERR_FILENO, timer_s[i]);
+    put_string_buffered(STDERR_FILENO, "S-");
+    put_int_buffered(STDERR_FILENO, timer_us[i]);
+    put_string_buffered(STDERR_FILENO, "us\n");
     timer_us[0] += timer_us[i];
     timer_s[0] += timer_s[i];
     timer_us[0] %= 1000000;
@@ -167,15 +164,15 @@ void __attribute((destructor)) after_main() {
     timer_h[0] += timer_h[i];
     timer_m[0] %= 60;
   }
-  PutString(STDERR_FILENO, "TOTAL: ");
-  PutInt(STDERR_FILENO, timer_h[0]);
-  PutString(STDERR_FILENO, "H-");
-  PutInt(STDERR_FILENO, timer_m[0]);
-  PutString(STDERR_FILENO, "M-");
-  PutInt(STDERR_FILENO, timer_s[0]);
-  PutString(STDERR_FILENO, "S-");
-  PutInt(STDERR_FILENO, timer_us[0]);
-  PutString(STDERR_FILENO, "us\n");
+  put_string_buffered(STDERR_FILENO, "TOTAL: ");
+  put_int_buffered(STDERR_FILENO, timer_h[0]);
+  put_string_buffered(STDERR_FILENO, "H-");
+  put_int_buffered(STDERR_FILENO, timer_m[0]);
+  put_string_buffered(STDERR_FILENO, "M-");
+  put_int_buffered(STDERR_FILENO, timer_s[0]);
+  put_string_buffered(STDERR_FILENO, "S-");
+  put_int_buffered(STDERR_FILENO, timer_us[0]);
+  put_string_buffered(STDERR_FILENO, "us\n");
 }
 
 void starttime() { gettimeofday(&timer_start, NULL); }
