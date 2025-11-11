@@ -108,7 +108,7 @@
     register long _x0 asm("x0");            \
     _x0 = _x0tmp;                           \
     register long _x8 asm("x8") = (number); \
-    asm volatile("svc	0\n\t"                \
+    asm volatile("svc 0\n\t"                \
                  : "=r"(_x0)                \
                  : "r"(_x8), "r"(_x0)       \
                  : "memory");               \
@@ -124,7 +124,7 @@
     _x0 = _x0tmp;                               \
     register long _x1 asm("x1") = _x1tmp;       \
     register long _x8 asm("x8") = (number);     \
-    asm volatile("svc	0\n\t"                    \
+    asm volatile("svc 0\n\t"                    \
                  : "=r"(_x0)                    \
                  : "r"(_x8), "r"(_x0), "r"(_x1) \
                  : "memory");                   \
@@ -142,7 +142,7 @@
     register long _x1 asm("x1") = _x1tmp;                 \
     register long _x2 asm("x2") = _x2tmp;                 \
     register long _x8 asm("x8") = (number);               \
-    asm volatile("svc	0\n\t"                              \
+    asm volatile("svc 0\n\t"                              \
                  : "=r"(_x0)                              \
                  : "r"(_x8), "r"(_x0), "r"(_x1), "r"(_x2) \
                  : "memory");                             \
@@ -157,7 +157,7 @@
     register long _x0 asm("x0");             \
     _x0 = _x0tmp;                            \
     register long _x8 asm("x16") = (number); \
-    asm volatile("svc	0x80\n\t"              \
+    asm volatile("svc 0x80\n\t"              \
                  : "=r"(_x0)                 \
                  : "r"(_x8), "r"(_x0)        \
                  : "memory");                \
@@ -173,7 +173,7 @@
     _x0 = _x0tmp;                               \
     register long _x1 asm("x1") = _x1tmp;       \
     register long _x8 asm("x16") = (number);    \
-    asm volatile("svc	0x80\n\t"                 \
+    asm volatile("svc 0x80\n\t"                 \
                  : "=r"(_x0)                    \
                  : "r"(_x8), "r"(_x0), "r"(_x1) \
                  : "memory");                   \
@@ -191,7 +191,7 @@
     register long _x1 asm("x1") = _x1tmp;                 \
     register long _x2 asm("x2") = _x2tmp;                 \
     register long _x8 asm("x16") = (number);              \
-    asm volatile("svc	0x80\n\t"                           \
+    asm volatile("svc 0x80\n\t"                           \
                  : "=r"(_x0)                              \
                  : "r"(_x8), "r"(_x0), "r"(_x1), "r"(_x2) \
                  : "memory");                             \
