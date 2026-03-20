@@ -44,11 +44,13 @@ LIBSYSY := $(BUILD_DIR)/libsysy.a
 TEST := $(BUILD_DIR)/test
 
 
-.PHONY: libsysy test clean
+.PHONY: libsysy test run-test clean
 
 libsysy: $(LIBSYSY)
 
-test: FORCE $(TEST)
+test: $(TEST)
+
+run-test: FORCE test
 	$(TEST) < $(TEST_IN) | diff - $(TEST_OUT)
 
 clean:
