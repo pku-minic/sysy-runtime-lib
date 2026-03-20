@@ -15,17 +15,14 @@ jobs:
         mode: [default, nolibc]
     steps:
       - name: Checkout Repository
-      - uses: actions/checkout@v6
+        uses: actions/checkout@v6
 
       - name: Build and Test (${{ matrix.mode }})
-        env:
-          AR: ar ru
-          RANLIB: ranlib
         run: |
           if [ "${{ matrix.mode }}" = "nolibc" ]; then
-            make run-test NO_LIBC=1
+            make run-test AR="ar ru" RANLIB="ranlib" NO_LIBC=1
           else
-            make run-test
+            make run-test AR="ar ru" RANLIB="ranlib"
           fi
 
   # Linux aarch64 (cross-compile + qemu)
@@ -36,7 +33,7 @@ jobs:
         mode: [default, nolibc]
     steps:
       - name: Checkout Repository
-      - uses: actions/checkout@v6
+        uses: actions/checkout@v6
 
       - name: Install dependencies
         run: |
@@ -46,13 +43,11 @@ jobs:
       - name: Build (${{ matrix.mode }})
         env:
           ADD_CFLAGS: --target=aarch64-linux-gnu
-          AR: aarch64-linux-gnu-ar ru
-          RANLIB: aarch64-linux-gnu-ranlib
         run: |
           if [ "${{ matrix.mode }}" = "nolibc" ]; then
-            make test NO_LIBC=1
+            make test AR="aarch64-linux-gnu-ar ru" RANLIB="aarch64-linux-gnu-ranlib" NO_LIBC=1
           else
-            make test
+            make test AR="aarch64-linux-gnu-ar ru" RANLIB="aarch64-linux-gnu-ranlib"
           fi
 
       - name: Test (${{ matrix.mode }})
@@ -69,7 +64,7 @@ jobs:
         mode: [default, nolibc]
     steps:
       - name: Checkout Repository
-      - uses: actions/checkout@v6
+        uses: actions/checkout@v6
 
       - name: Install dependencies
         run: |
@@ -79,13 +74,11 @@ jobs:
       - name: Build (${{ matrix.mode }})
         env:
           ADD_CFLAGS: --target=riscv64-linux-gnu
-          AR: riscv64-linux-gnu-ar ru
-          RANLIB: riscv64-linux-gnu-ranlib
         run: |
           if [ "${{ matrix.mode }}" = "nolibc" ]; then
-            make test NO_LIBC=1
+            make test AR="riscv64-linux-gnu-ar ru" RANLIB="riscv64-linux-gnu-ranlib" NO_LIBC=1
           else
-            make test
+            make test AR="riscv64-linux-gnu-ar ru" RANLIB="riscv64-linux-gnu-ranlib"
           fi
 
       - name: Test (${{ matrix.mode }})
@@ -102,7 +95,7 @@ jobs:
         mode: [default, nolibc]
     steps:
       - name: Checkout Repository
-      - uses: actions/checkout@v6
+        uses: actions/checkout@v6
 
       - name: Install dependencies
         run: |
@@ -112,13 +105,11 @@ jobs:
       - name: Build (${{ matrix.mode }})
         env:
           ADD_CFLAGS: --target=riscv32-linux-gnu
-          AR: riscv32-linux-gnu-ar ru
-          RANLIB: riscv32-linux-gnu-ranlib
         run: |
           if [ "${{ matrix.mode }}" = "nolibc" ]; then
-            make test NO_LIBC=1
+            make test AR="riscv32-linux-gnu-ar ru" RANLIB="riscv32-linux-gnu-ranlib" NO_LIBC=1
           else
-            make test
+            make test AR="riscv32-linux-gnu-ar ru" RANLIB="riscv32-linux-gnu-ranlib"
           fi
 
       - name: Test (${{ matrix.mode }})
@@ -135,17 +126,14 @@ jobs:
         mode: [default, nolibc]
     steps:
       - name: Checkout Repository
-      - uses: actions/checkout@v6
+        uses: actions/checkout@v6
 
       - name: Build and Test (${{ matrix.mode }})
-        env:
-          AR: ar ru
-          RANLIB: ranlib
         run: |
           if [ "${{ matrix.mode }}" = "nolibc" ]; then
-            make run-test NO_LIBC=1
+            make run-test AR="ar ru" RANLIB="ranlib" NO_LIBC=1
           else
-            make run-test
+            make run-test AR="ar ru" RANLIB="ranlib"
           fi
 
   # macOS aarch64 (native on macos-latest)
@@ -156,15 +144,12 @@ jobs:
         mode: [default, nolibc]
     steps:
       - name: Checkout Repository
-      - uses: actions/checkout@v6
+        uses: actions/checkout@v6
 
       - name: Build and Test (${{ matrix.mode }})
-        env:
-          AR: ar ru
-          RANLIB: ranlib
         run: |
           if [ "${{ matrix.mode }}" = "nolibc" ]; then
-            make run-test NO_LIBC=1
+            make run-test AR="ar ru" RANLIB="ranlib" NO_LIBC=1
           else
-            make run-test
+            make run-test AR="ar ru" RANLIB="ranlib"
           fi
