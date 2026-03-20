@@ -10,6 +10,8 @@ jobs:
   # Linux x86-64 (native)
   linux-x86_64:
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'skip-ci')"
+    timeout-minutes: 30
     strategy:
       matrix:
         mode: [default, nolibc]
@@ -28,6 +30,8 @@ jobs:
   # Linux aarch64 (cross-compile + qemu)
   linux-aarch64:
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'skip-ci')"
+    timeout-minutes: 30
     strategy:
       matrix:
         mode: [default, nolibc]
@@ -60,6 +64,8 @@ jobs:
   # Linux riscv64 (cross-compile + qemu)
   linux-riscv64:
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'skip-ci')"
+    timeout-minutes: 30
     strategy:
       matrix:
         mode: [default, nolibc]
@@ -92,6 +98,8 @@ jobs:
   # Linux riscv32 (cross-compile + qemu)
   linux-riscv32:
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'skip-ci')"
+    timeout-minutes: 30
     strategy:
       matrix:
         mode: [nolibc]
@@ -123,6 +131,8 @@ jobs:
   # macOS x86-64 (native on macos-15)
   macos-x86_64:
     runs-on: macos-15-intel
+    if: "!contains(github.event.head_commit.message, 'skip-ci')"
+    timeout-minutes: 30
     strategy:
       matrix:
         mode: [default, nolibc]
@@ -141,6 +151,8 @@ jobs:
   # macOS aarch64 (native on macos-latest)
   macos-aarch64:
     runs-on: macos-latest
+    if: "!contains(github.event.head_commit.message, 'skip-ci')"
+    timeout-minutes: 30
     strategy:
       matrix:
         mode: [default, nolibc]
