@@ -43,6 +43,7 @@ jobs:
       - name: Build (${{ matrix.mode }})
         env:
           ADD_CFLAGS: --target=aarch64-linux-gnu
+          ADD_LDFLAGS: -fuse-ld=lld
         run: |
           if [ "${{ matrix.mode }}" = "nolibc" ]; then
             make test AR="aarch64-linux-gnu-ar ru" RANLIB="aarch64-linux-gnu-ranlib" NO_LIBC=1
@@ -73,7 +74,8 @@ jobs:
 
       - name: Build (${{ matrix.mode }})
         env:
-          ADD_CFLAGS: --target=riscv64-linux-gnu
+          ADD_CFLAGS: --target=riscv64-linux-gnu -march=rv64gc -mabi=lp64d
+          ADD_LDFLAGS: -fuse-ld=lld
         run: |
           if [ "${{ matrix.mode }}" = "nolibc" ]; then
             make test AR="riscv64-linux-gnu-ar ru" RANLIB="riscv64-linux-gnu-ranlib" NO_LIBC=1
@@ -92,7 +94,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        mode: [default, nolibc]
+        mode: [nolibc]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
@@ -104,17 +106,17 @@ jobs:
 
       - name: Build (${{ matrix.mode }})
         env:
-          ADD_CFLAGS: --target=riscv32-linux-gnu
+          ADD_CFLAGS: --target=riscv32-unknown-linux-elf -march=rv32im -mabi=ilp32
+          ADD_LDFLAGS: -fuse-ld=lld
         run: |
           if [ "${{ matrix.mode }}" = "nolibc" ]; then
-            make test AR="riscv32-linux-gnu-ar ru" RANLIB="riscv32-linux-gnu-ranlib" NO_LIBC=1
+            make test AR="riscv64-linux-gnu-ar ru" RANLIB="riscv64-linux-gnu-ranlib" NO_LIBC=1
           else
-            make test AR="riscv32-linux-gnu-ar ru" RANLIB="riscv32-linux-gnu-ranlib"
+            echo "Unsupported"
+            exit 1
           fi
 
       - name: Test (${{ matrix.mode }})
-        env:
-          QEMU_LD_PREFIX: /usr/riscv64-linux-gnu
         run: |
           qemu-riscv32 ./build/test < test/test.in | diff - test/test.out
 

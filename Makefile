@@ -1,6 +1,7 @@
 # parameters
 NO_LIBC ?= 0
 ADD_CFLAGS ?=
+ADD_LDFLAGS ?=
 LIB_OPT ?= -O3
 TEST_OPT ?= -O1
 
@@ -65,7 +66,7 @@ $(LIBSYSY): $(OBJS)
 	$(RANLIB) $@
 
 $(TEST): $(LIBSYSY) $(TEST_SRC)
-	$(CC) $(TEST_SRC) -o $@ -I$(SRC_DIR) -L$(BUILD_DIR) -lsysy $(TEST_OPT)
+	$(CC) $(ADD_LDFLAGS) $(TEST_SRC) -o $@ -I$(SRC_DIR) -L$(BUILD_DIR) -lsysy $(TEST_OPT)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	mkdir -p $(dir $@)
