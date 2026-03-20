@@ -15,6 +15,12 @@ make
 
 The output (`libsysy.a`) will be generated in directory `build`.
 
+## Running Test
+
+```sh
+make test
+```
+
 ## Copyright and License
 
-Copyright (C) 2022-2024 MaxXing. License GPLv3.
+Copyright (C) 2022-2026 MaxXing. License GPLv3.
