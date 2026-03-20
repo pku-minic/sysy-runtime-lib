@@ -36,6 +36,8 @@ SRCS += $(shell find $(SRC_DIR)/nolibc -name "*.c")
 endif
 OBJS := $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
 TEST_SRC := $(TEST_DIR)/test.c
+TEST_IN := $(TEST_DIR)/test.in
+TEST_OUT := $(TEST_DIR)/test.out
 
 # targets
 LIBSYSY := $(BUILD_DIR)/libsysy.a
@@ -46,11 +48,14 @@ TEST := $(BUILD_DIR)/test
 
 libsysy: $(LIBSYSY)
 
-test: $(TEST)
+test: FORCE $(TEST)
+	$(TEST) < $(TEST_IN) | diff - $(TEST_OUT)
 
 clean:
 	-rm -rf $(OBJ_DIR)
 	-rm $(LIBSYSY)
+
+FORCE: ;
 
 $(LIBSYSY): $(OBJS)
 	mkdir -p $(dir $@)
