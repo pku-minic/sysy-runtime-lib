@@ -6,7 +6,6 @@
 #else
 #include <sys/time.h>
 #include <unistd.h>
-int clock_gettime(int clk_id, struct timespec *tp);
 #endif
 
 // ============================================================
@@ -137,9 +136,9 @@ void putarray(int n, int a[]) {
 // ============================================================
 
 #define TIMER_COUNT_MAX 1024
-static struct timespec timer_start, timer_end;
+static struct timeval timer_start, timer_end;
 static int timer_h[TIMER_COUNT_MAX], timer_m[TIMER_COUNT_MAX],
-    timer_s[TIMER_COUNT_MAX], timer_ns[TIMER_COUNT_MAX];
+    timer_s[TIMER_COUNT_MAX], timer_us[TIMER_COUNT_MAX];
 static int timer_idx = 1;
 
 void __attribute((destructor)) after_main() {
@@ -155,11 +154,11 @@ void __attribute((destructor)) after_main() {
     put_string_buffered(STDERR_FILENO, "M-");
     put_int_buffered(STDERR_FILENO, timer_s[i]);
     put_string_buffered(STDERR_FILENO, "S-");
-    put_int_buffered(STDERR_FILENO, timer_ns[i] / 1000);
+    put_int_buffered(STDERR_FILENO, timer_us[i]);
     put_string_buffered(STDERR_FILENO, "us\n");
-    timer_ns[0] += timer_ns[i];
+    timer_us[0] += timer_us[i];
     timer_s[0] += timer_s[i];
-    timer_ns[0] %= 1000000000;
+    timer_us[0] %= 1000000;
     timer_m[0] += timer_m[i];
     timer_s[0] %= 60;
     timer_h[0] += timer_h[i];
@@ -172,18 +171,18 @@ void __attribute((destructor)) after_main() {
   put_string_buffered(STDERR_FILENO, "M-");
   put_int_buffered(STDERR_FILENO, timer_s[0]);
   put_string_buffered(STDERR_FILENO, "S-");
-  put_int_buffered(STDERR_FILENO, timer_ns[0] / 100);
+  put_int_buffered(STDERR_FILENO, timer_us[0]);
   put_string_buffered(STDERR_FILENO, "us\n");
 }
 
-void starttime() { clock_gettime(1, &timer_start); }
+void starttime() { gettimeofday(&timer_start, NULL); }
 
 void stoptime() {
-  clock_gettime(1, &timer_start);
-  timer_ns[timer_idx] += 1000000000 * (timer_end.tv_sec - timer_start.tv_sec) +
-                         timer_end.tv_nsec - timer_start.tv_nsec;
-  timer_s[timer_idx] += timer_ns[timer_idx] / 1000000000;
-  timer_ns[timer_idx] %= 1000000000;
+  gettimeofday(&timer_end, NULL);
+  timer_us[timer_idx] += 1000000 * (timer_end.tv_sec - timer_start.tv_sec) +
+                         timer_end.tv_usec - timer_start.tv_usec;
+  timer_s[timer_idx] += timer_us[timer_idx] / 1000000;
+  timer_us[timer_idx] %= 1000000;
   timer_m[timer_idx] += timer_s[timer_idx] / 60;
   timer_s[timer_idx] %= 60;
   timer_h[timer_idx] += timer_m[timer_idx] / 60;
