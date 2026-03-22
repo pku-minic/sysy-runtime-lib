@@ -2,34 +2,34 @@
 
 #include "nolibc/sys.h"
 
-int gettimeofday(struct timeval *tv, void *tz) {
-  return SYSCALL2(SYS_GETTIMEOFDAY, tv, tz);
-}
+#if defined(SYS_LINUX) && defined(SYS_32)
 
-// compat struct, only for syscall
 struct timespec64 {
   long long tv_sec;
   long long tv_nsec;
 };
 
 int do_clock_gettime64(int clk_id, struct timespec64 *tp) {
-    return SYSCALL2(SYS_clock_gettime64, clk_id, tp);
+  return SYSCALL2(SYS_CLOCK_GETTIME64, clk_id, tp);
 }
 
-int clock_gettime(int clk_id, struct timespec *tp) {
-    struct timespec64 ts64;
-    int ret;
+#endif
 
-    if (!tp) {
-        return -1; 
+int gettimeofday(struct timeval *tv, void *tz) {
+// gettimeofday does not work on qemu's riscv32
+// use clock_gettime64 instead
+#if defined(SYS_LINUX) && defined(SYS_32)
+  struct timespec64 ts64;
+
+  if (do_clock_gettime64(CLOCK_MONOTONIC, &ts64) == 0) {
+    if (tv) {
+      tv->tv_sec = (long)ts64.tv_sec;
+      tv->tv_usec = (long)ts64.tv_nsec / 1000;
     }
-
-    ret = do_clock_gettime64(clk_id, &ts64);
-
-    if (ret == 0) {
-        tp->tv_sec = (long)ts64.tv_sec;
-        tp->tv_nsec = (long)ts64.tv_nsec;
-    }
-
-    return ret;
+    return 0;
+  }
+  return -1;
+#else
+  return SYSCALL2(SYS_GETTIMEOFDAY, tv, tz);
+#endif
 }
