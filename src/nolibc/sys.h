@@ -33,8 +33,6 @@
 
 // Reference: printf SYS_[a-z]* | gcc -include sys/syscall.h -E -
 #ifdef SYS_LINUX
-#define CLOCK_REALTIME 0
-#define CLOCK_MONOTONIC 1
 #ifdef SYS_X86_64
 #define SYS_READ 0
 #define SYS_WRITE 1
@@ -45,7 +43,6 @@
 #define SYS_WRITE 64
 #define SYS_EXIT 93
 #define SYS_GETTIMEOFDAY 169
-#define SYS_CLOCK_GETTIME64 403
 #endif
 #else  // macOS.
 #ifdef SYS_X86_64
