@@ -1,6 +1,8 @@
 #include "nolibc/sys.h"
 #include "nolibc/types.h"
 
+#define SIGABRT 6
+
 extern int main();
 extern void after_main();
 
@@ -21,4 +23,12 @@ void *memcpy(void *dest, const void *src, size_t n) {
   const char *s = src;
   while (n--) *d++ = *s++;
   return dest;
+}
+
+void abort() {
+  int pid = SYSCALL0(SYS_GETPID);
+  SYSCALL2(SYS_KILL, pid, SIGABRT);
+  // if kill returns, exit with error
+  SYSCALL1(SYS_EXIT, 1);
+  __builtin_unreachable();
 }

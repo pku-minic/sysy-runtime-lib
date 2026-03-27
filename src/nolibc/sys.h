@@ -38,11 +38,15 @@
 #define SYS_WRITE 1
 #define SYS_EXIT 60
 #define SYS_GETTIMEOFDAY 96
+#define SYS_KILL 62
+#define SYS_GETPID 39
 #else  // AArch64 and RISC-V.
 #define SYS_READ 63
 #define SYS_WRITE 64
 #define SYS_EXIT 93
 #define SYS_GETTIMEOFDAY 169
+#define SYS_KILL 129
+#define SYS_GETPID 172
 #endif
 #else  // macOS.
 #ifdef SYS_X86_64
@@ -50,16 +54,29 @@
 #define SYS_WRITE (0x2000000 | 4)
 #define SYS_EXIT (0x2000000 | 1)
 #define SYS_GETTIMEOFDAY (0x2000000 | 116)
+#define SYS_KILL (0x2000000 | 37)
+#define SYS_GETPID (0x2000000 | 20)
 #else  // AArch64.
 #define SYS_READ 3
 #define SYS_WRITE 4
 #define SYS_EXIT 1
 #define SYS_GETTIMEOFDAY 116
+#define SYS_KILL 37
+#define SYS_GETPID 20
 #endif
 #endif
 
 // Reference: libc/sysdeps/unix/sysv/linux/*/sysdep.h
 #if defined(SYS_X86_64)
+#define SYSCALL0(number)                         \
+  ({                                             \
+    unsigned long int resultvar;                 \
+    asm volatile("syscall\n\t"                   \
+                 : "=a"(resultvar)               \
+                 : "0"(number)                   \
+                 : "memory", "cc", "r11", "cx"); \
+    (long int)resultvar;                         \
+  })
 #define SYSCALL1(number, arg0)                            \
   ({                                                      \
     unsigned long int resultvar;                          \
@@ -101,6 +118,15 @@
   })
 #elif defined(SYS_AARCH64)
 #ifdef SYS_LINUX
+#define SYSCALL0(number)                                         \
+  ({                                                             \
+    long _sys_result;                                            \
+    register long _x0 asm("x0");                                 \
+    register long _x8 asm("x8") = (number);                      \
+    asm volatile("svc 0\n\t" : "=r"(_x0) : "r"(_x8) : "memory"); \
+    _sys_result = _x0;                                           \
+    _sys_result;                                                 \
+  })
 #define SYSCALL1(number, arg0)                                             \
   ({                                                                       \
     long _sys_result;                                                      \
@@ -147,6 +173,15 @@
     _sys_result;                                          \
   })
 #else  // macOS.
+#define SYSCALL0(number)                                            \
+  ({                                                                \
+    long _sys_result;                                               \
+    register long _x0 asm("x0");                                    \
+    register long _x8 asm("x16") = (number);                        \
+    asm volatile("svc 0x80\n\t" : "=r"(_x0) : "r"(_x8) : "memory"); \
+    _sys_result = _x0;                                              \
+    _sys_result;                                                    \
+  })
 #define SYSCALL1(number, arg0)                                                \
   ({                                                                          \
     long _sys_result;                                                         \
@@ -194,6 +229,15 @@
   })
 #endif
 #else  // RISC-V.
+#define SYSCALL0(number)                                           \
+  ({                                                               \
+    long int _sys_result;                                          \
+    register long int __a7 asm("a7") = number;                     \
+    register long int __a0 asm("a0");                              \
+    asm volatile("ecall\n\t" : "=r"(__a0) : "r"(__a7) : "memory"); \
+    _sys_result = __a0;                                            \
+    _sys_result;                                                   \
+  })
 #define SYSCALL1(number, arg0)                                     \
   ({                                                               \
     long int _sys_result;                                          \
