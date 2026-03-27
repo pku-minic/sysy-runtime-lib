@@ -1,9 +1,11 @@
 #include "sysy.h"
 
 #ifdef NO_LIBC
+#include "nolibc/crt.h"
 #include "nolibc/io.h"
 #include "nolibc/time.h"
 #else
+#include <stdlib.h>
 #include <sys/time.h>
 #include <unistd.h>
 #endif
@@ -33,6 +35,7 @@ static void flush_buffer(int fd) {
 
 static void write_buffer(int fd, const void *buffer, size_t size) {
   if (fd == STDERR_FILENO) {
+    // do not buffer stderr
     write(fd, buffer, size);
   } else {
     if (output_buffer_index + size > OUTPUT_BUFFER_SIZE) flush_buffer(fd);
@@ -135,43 +138,26 @@ void putarray(int n, int a[]) {
 // Implementations of timing functions.
 // ============================================================
 
-#define TIMER_COUNT_MAX 1024
 static struct timeval timer_start, timer_end;
-static int timer_h[TIMER_COUNT_MAX], timer_m[TIMER_COUNT_MAX],
-    timer_s[TIMER_COUNT_MAX], timer_us[TIMER_COUNT_MAX];
-static int timer_idx = 1;
 
-void __attribute((destructor)) after_main() {
-  // clear output buffer
-  write(STDOUT_FILENO, output_buffer, output_buffer_index);
-  // print timing results
-  if (timer_idx <= 1) return;
-  for (int i = 1; i < timer_idx; i++) {
-    put_string_buffered(STDERR_FILENO, "Timer: ");
-    put_int_buffered(STDERR_FILENO, timer_h[i]);
-    put_string_buffered(STDERR_FILENO, "H-");
-    put_int_buffered(STDERR_FILENO, timer_m[i]);
-    put_string_buffered(STDERR_FILENO, "M-");
-    put_int_buffered(STDERR_FILENO, timer_s[i]);
-    put_string_buffered(STDERR_FILENO, "S-");
-    put_int_buffered(STDERR_FILENO, timer_us[i]);
-    put_string_buffered(STDERR_FILENO, "us\n");
-    timer_us[0] += timer_us[i];
-    timer_s[0] += timer_s[i];
-    timer_us[0] %= 1000000;
-    timer_m[0] += timer_m[i];
-    timer_s[0] %= 60;
-    timer_h[0] += timer_h[i];
-    timer_m[0] %= 60;
-  }
-  put_string_buffered(STDERR_FILENO, "TOTAL: ");
-  put_int_buffered(STDERR_FILENO, timer_h[0]);
+typedef struct {
+  int h, m, s, us;
+} timer_t;
+
+#define TIMER_COUNT_MAX 1024
+static timer_t timer[TIMER_COUNT_MAX] = {};
+static int timer_idx = 0;
+
+static void put_timer(const char *name, const timer_t *t) {
+  put_string_buffered(STDERR_FILENO, name);
+  put_string_buffered(STDERR_FILENO, ": ");
+  put_int_buffered(STDERR_FILENO, t->h);
   put_string_buffered(STDERR_FILENO, "H-");
-  put_int_buffered(STDERR_FILENO, timer_m[0]);
+  put_int_buffered(STDERR_FILENO, t->m);
   put_string_buffered(STDERR_FILENO, "M-");
-  put_int_buffered(STDERR_FILENO, timer_s[0]);
+  put_int_buffered(STDERR_FILENO, t->s);
   put_string_buffered(STDERR_FILENO, "S-");
-  put_int_buffered(STDERR_FILENO, timer_us[0]);
+  put_int_buffered(STDERR_FILENO, t->us);
   put_string_buffered(STDERR_FILENO, "us\n");
 }
 
@@ -179,13 +165,37 @@ void starttime() { gettimeofday(&timer_start, NULL); }
 
 void stoptime() {
   gettimeofday(&timer_end, NULL);
-  timer_us[timer_idx] += 1000000 * (timer_end.tv_sec - timer_start.tv_sec) +
-                         timer_end.tv_usec - timer_start.tv_usec;
-  timer_s[timer_idx] += timer_us[timer_idx] / 1000000;
-  timer_us[timer_idx] %= 1000000;
-  timer_m[timer_idx] += timer_s[timer_idx] / 60;
-  timer_s[timer_idx] %= 60;
-  timer_h[timer_idx] += timer_m[timer_idx] / 60;
-  timer_m[timer_idx] %= 60;
+
+  // abort if timer_idx is invalid
+  if (timer_idx >= TIMER_COUNT_MAX) abort();
+
+  timer_t *t = &timer[timer_idx];
+  t->us += 1000000 * (timer_end.tv_sec - timer_start.tv_sec) +
+           timer_end.tv_usec - timer_start.tv_usec;
+  t->s += t->us / 1000000;
+  t->us %= 1000000;
+  t->m += t->s / 60;
+  t->s %= 60;
+  t->h += t->m / 60;
+  t->m %= 60;
+
   timer_idx++;
+}
+
+void __attribute((destructor)) after_main() {
+  // clear output buffer
+  flush_buffer(STDOUT_FILENO);
+
+  // print timing results
+  if (timer_idx <= 0) return;
+  timer_t total = {};
+  for (int i = 0; i < timer_idx; i++) {
+    timer_t *t = &timer[i];
+    put_timer("Timer", t);
+    total.us += t->us;
+    total.s += t->s;
+    total.m += t->m;
+    total.h += t->h;
+  }
+  put_timer("TOTAL", &total);
 }
