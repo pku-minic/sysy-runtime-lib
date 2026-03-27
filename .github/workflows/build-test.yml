@@ -19,13 +19,17 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v6
 
-      - name: Build and Test (${{ matrix.mode }})
+      - name: Build (${{ matrix.mode }})
         run: |
           if [ "${{ matrix.mode }}" = "nolibc" ]; then
-            make run-test AR="ar ru" RANLIB="ranlib" NO_LIBC=1
+            make test AR="ar ru" RANLIB="ranlib" NO_LIBC=1
           else
-            make run-test AR="ar ru" RANLIB="ranlib"
+            make test AR="ar ru" RANLIB="ranlib"
           fi
+      
+      - name: Test (${{ matrix.mode }})
+        run: |
+          python3 run_tests.py
 
   # Linux aarch64 (cross-compile + qemu)
   linux-aarch64:
@@ -59,7 +63,7 @@ jobs:
         env:
           QEMU_LD_PREFIX: /usr/aarch64-linux-gnu
         run: |
-          qemu-aarch64 ./build/test < test/test.in | diff - test/test.out
+          python3 run_tests.py --runner "qemu-aarch64"
 
   # Linux riscv64 (cross-compile + qemu)
   linux-riscv64:
@@ -93,7 +97,7 @@ jobs:
         env:
           QEMU_LD_PREFIX: /usr/riscv64-linux-gnu
         run: |
-          qemu-riscv64 ./build/test < test/test.in | diff - test/test.out
+          python3 run_tests.py --runner "qemu-riscv64"
 
   # Linux riscv32 (cross-compile + qemu)
   linux-riscv32:
@@ -126,7 +130,7 @@ jobs:
 
       - name: Test (${{ matrix.mode }})
         run: |
-          qemu-riscv32 ./build/test < test/test.in | diff - test/test.out
+          python3 run_tests.py --runner "qemu-riscv32"
 
   # macOS x86-64 (native on macos-15)
   macos-x86_64:
@@ -140,13 +144,17 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v6
 
-      - name: Build and Test (${{ matrix.mode }})
+      - name: Build (${{ matrix.mode }})
         run: |
           if [ "${{ matrix.mode }}" = "nolibc" ]; then
-            make run-test AR="ar ru" RANLIB="ranlib" NO_LIBC=1
+            make test AR="ar ru" RANLIB="ranlib" NO_LIBC=1
           else
-            make run-test AR="ar ru" RANLIB="ranlib"
+            make test AR="ar ru" RANLIB="ranlib"
           fi
+      
+      - name: Test (${{ matrix.mode }})
+        run: |
+          python3 run_tests.py
 
   # macOS aarch64 (native on macos-latest)
   macos-aarch64:
@@ -160,10 +168,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v6
 
-      - name: Build and Test (${{ matrix.mode }})
+      - name: Build (${{ matrix.mode }})
         run: |
           if [ "${{ matrix.mode }}" = "nolibc" ]; then
-            make run-test AR="ar ru" RANLIB="ranlib" NO_LIBC=1
+            make test AR="ar ru" RANLIB="ranlib" NO_LIBC=1
           else
-            make run-test AR="ar ru" RANLIB="ranlib"
+            make test AR="ar ru" RANLIB="ranlib"
           fi
+
+      - name: Test (${{ matrix.mode }})
+        run: |
+          python3 run_tests.py

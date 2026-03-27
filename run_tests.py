@@ -11,6 +11,7 @@ import subprocess
 import argparse
 from pathlib import Path
 import tomllib
+import shlex
 
 
 def parse_args() -> argparse.Namespace:
@@ -22,6 +23,8 @@ def parse_args() -> argparse.Namespace:
                       help='Directory containing test `.c` files (default: test)')
   parser.add_argument('--build-dir', type=str, default='build/test',
                       help='Directory containing built test executables (default: build/test)')
+  parser.add_argument('--runner', type=str, default='',
+                      help='Command prefix to run test executables (e.g., qemu-riscv32)')
   return parser.parse_args()
 
 
@@ -88,7 +91,7 @@ def load_file_content(file_path: Path) -> str | None:
 
 
 def run_single_test(test_name: str, executable: Path, test_dir: Path,
-                    timeout: int) -> tuple[str, str]:
+                    timeout: int, runner: str) -> tuple[str, str]:
   '''
   Runs a single test and return `(result, detail_message)`.
   '''
@@ -103,10 +106,16 @@ def run_single_test(test_name: str, executable: Path, test_dir: Path,
   expected_exit_code = toml_config.get('exit_code')
   check_timer = toml_config.get('check_timer', False)
 
+  # Build command with optional runner prefix
+  if runner:
+    cmd = shlex.split(runner) + [str(executable)]
+  else:
+    cmd = [str(executable)]
+
   # Run the test
   try:
     result = subprocess.run(
-        [str(executable)],
+        cmd,
         input=stdin_content,
         capture_output=True,
         text=True,
@@ -216,7 +225,7 @@ def main():
       detail = ''
     else:
       result, detail = run_single_test(test_name, executable, test_dir,
-                                       args.timeout)
+                                       args.timeout, args.runner)
 
     results[result].append(test_name)
 
