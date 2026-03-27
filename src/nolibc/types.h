@@ -1,7 +1,5 @@
-#ifndef LIBSYSY_TYPE_H_
-#define LIBSYSY_TYPE_H_
-
-#include "nolibc/sys.h"
+#ifndef LIBSYSY_NOLIBC_TYPE_H_
+#define LIBSYSY_NOLIBC_TYPE_H_
 
 #ifdef SYS_32
 typedef int ssize_t;
@@ -16,4 +14,4 @@ typedef int clockid_t;
 
 #define NULL ((void *)0)
 
-#endif  // LIBSYSY_TYPE_H_
+#endif  // LIBSYSY_NOLIBC_TYPE_H_

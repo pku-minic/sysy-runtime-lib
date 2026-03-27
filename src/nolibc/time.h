@@ -1,7 +1,6 @@
-#ifndef LIBSYSY_TIME_H_
-#define LIBSYSY_TIME_H_
+#ifndef LIBSYSY_NOLIBC_TIME_H_
+#define LIBSYSY_NOLIBC_TIME_H_
 
-#include "nolibc/sys.h"
 #include "nolibc/types.h"
 
 #ifdef SYS_MACOS
@@ -17,4 +16,4 @@ struct timespec {
 
 int clock_gettime(clockid_t clk_id, struct timespec *tp);
 
-#endif  // LIBSYSY_TIME_H_
+#endif  // LIBSYSY_NOLIBC_TIME_H_

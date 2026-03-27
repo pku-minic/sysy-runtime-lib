@@ -1,5 +1,5 @@
-#ifndef LIBSYSY_SYS_H_
-#define LIBSYSY_SYS_H_
+#ifndef LIBSYSY_NOLIBC_SYS_H_
+#define LIBSYSY_NOLIBC_SYS_H_
 
 #if defined(__linux__)
 #define SYS_LINUX
@@ -279,4 +279,4 @@
   })
 #endif
 
-#endif  // LIBSYSY_SYS_H_
+#endif  // LIBSYSY_NOLIBC_SYS_H_
