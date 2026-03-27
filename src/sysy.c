@@ -142,13 +142,13 @@ static struct timeval timer_start, timer_end;
 
 typedef struct {
   int h, m, s, us;
-} timer_t;
+} sysy_timer_t;
 
 #define TIMER_COUNT_MAX 1024
-static timer_t timer[TIMER_COUNT_MAX] = {};
+static sysy_timer_t timers[TIMER_COUNT_MAX] = {};
 static int timer_idx = 0;
 
-static void put_timer(const char *name, const timer_t *t) {
+static void put_timer(const char *name, const sysy_timer_t *t) {
   put_string_buffered(STDERR_FILENO, name);
   put_string_buffered(STDERR_FILENO, ": ");
   put_int_buffered(STDERR_FILENO, t->h);
@@ -169,7 +169,7 @@ void stoptime() {
   // abort if timer_idx is invalid
   if (timer_idx >= TIMER_COUNT_MAX) abort();
 
-  timer_t *t = &timer[timer_idx];
+  sysy_timer_t *t = &timers[timer_idx];
   t->us += 1000000 * (timer_end.tv_sec - timer_start.tv_sec) +
            timer_end.tv_usec - timer_start.tv_usec;
   t->s += t->us / 1000000;
@@ -188,9 +188,9 @@ void __attribute((destructor)) after_main() {
 
   // print timing results
   if (timer_idx <= 0) return;
-  timer_t total = {};
+  sysy_timer_t total = {};
   for (int i = 0; i < timer_idx; i++) {
-    timer_t *t = &timer[i];
+    sysy_timer_t *t = &timers[i];
     put_timer("Timer", t);
     total.us += t->us;
     total.s += t->s;
