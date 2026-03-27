@@ -37,14 +37,14 @@
 #define SYS_READ 0
 #define SYS_WRITE 1
 #define SYS_EXIT 60
-#define SYS_GETTIMEOFDAY 96
+#define SYS_CLOCK_GETTIME 228
 #define SYS_KILL 62
 #define SYS_GETPID 39
 #else  // AArch64 and RISC-V.
 #define SYS_READ 63
 #define SYS_WRITE 64
 #define SYS_EXIT 93
-#define SYS_GETTIMEOFDAY 169
+#define SYS_CLOCK_GETTIME 113
 #define SYS_KILL 129
 #define SYS_GETPID 172
 #endif

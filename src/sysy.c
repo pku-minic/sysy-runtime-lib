@@ -6,7 +6,7 @@
 #include "nolibc/time.h"
 #else
 #include <stdlib.h>
-#include <sys/time.h>
+#include <time.h>
 #include <unistd.h>
 #endif
 
@@ -138,7 +138,7 @@ void putarray(int n, int a[]) {
 // Implementations of timing functions.
 // ============================================================
 
-static struct timeval timer_start, timer_end;
+static struct timespec timer_start, timer_end;
 
 typedef struct {
   int h, m, s, us;
@@ -161,10 +161,10 @@ static void put_timer(const char *name, const sysy_timer_t *t) {
   put_string_buffered(STDERR_FILENO, "us\n");
 }
 
-void starttime() { gettimeofday(&timer_start, NULL); }
+void starttime() { clock_gettime(CLOCK_MONOTONIC, &timer_start); }
 
 void stoptime() {
-  gettimeofday(&timer_end, NULL);
+  clock_gettime(CLOCK_MONOTONIC, &timer_end);
 
   // abort if timer_idx is invalid
   if (timer_idx >= TIMER_COUNT_MAX) {
@@ -174,7 +174,7 @@ void stoptime() {
 
   sysy_timer_t *t = &timers[timer_idx];
   t->us += 1000000 * (timer_end.tv_sec - timer_start.tv_sec) +
-           timer_end.tv_usec - timer_start.tv_usec;
+           (timer_end.tv_nsec - timer_start.tv_nsec) / 1000;
   t->s += t->us / 1000000;
   t->us %= 1000000;
   t->m += t->s / 60;

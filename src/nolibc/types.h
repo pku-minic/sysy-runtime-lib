@@ -11,6 +11,9 @@ typedef long ssize_t;
 typedef unsigned long size_t;
 #endif
 
+typedef long time_t;
+typedef int clockid_t;
+
 #define NULL ((void *)0)
 
 #endif  // LIBSYSY_TYPE_H_

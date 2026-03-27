@@ -4,16 +4,17 @@
 #include "nolibc/sys.h"
 #include "nolibc/types.h"
 
-struct timeval {
-  long tv_sec;
-  long tv_usec;
-};
-
-int gettimeofday(struct timeval *tv, void *tz);
-
-#if defined(SYS_LINUX)
-#define CLOCK_REALTIME 0
+#ifdef SYS_MACOS
+#define CLOCK_MONOTONIC 6
+#else  // SYS_LINUX
 #define CLOCK_MONOTONIC 1
 #endif
+
+struct timespec {
+  time_t tv_sec;
+  long tv_nsec;
+};
+
+int clock_gettime(clockid_t clk_id, struct timespec *tp);
 
 #endif  // LIBSYSY_TIME_H_
