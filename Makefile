@@ -29,6 +29,7 @@ SRC_DIR := $(TOP_DIR)/src
 TEST_DIR := $(TOP_DIR)/test
 BUILD_DIR := $(TOP_DIR)/build
 OBJ_DIR := $(BUILD_DIR)/obj
+BUILT_TEST_DIR := $(BUILD_DIR)/test
 
 # files
 SRCS := $(SRC_DIR)/sysy.c
@@ -36,26 +37,22 @@ ifneq ($(NO_LIBC), 0)
 SRCS += $(shell find $(SRC_DIR)/nolibc -name "*.c")
 endif
 OBJS := $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
-TEST_SRC := $(TEST_DIR)/test.c
-TEST_IN := $(TEST_DIR)/test.in
-TEST_OUT := $(TEST_DIR)/test.out
+TEST_SRCS := $(shell find $(TEST_DIR) -name "*.c")
 
 # targets
 LIBSYSY := $(BUILD_DIR)/libsysy.a
-TEST := $(BUILD_DIR)/test
+TESTS := $(patsubst $(TEST_DIR)/%.c, $(BUILT_TEST_DIR)/%, $(TEST_SRCS))
 
 
-.PHONY: libsysy test run-test clean
+.PHONY: libsysy test clean
 
 libsysy: $(LIBSYSY)
 
-test: $(TEST)
-
-run-test: FORCE test
-	$(TEST) < $(TEST_IN) | diff - $(TEST_OUT)
+test: $(TESTS)
 
 clean:
 	-rm -rf $(OBJ_DIR)
+	-rm -rf $(BUILT_TEST_DIR)
 	-rm $(LIBSYSY)
 
 FORCE: ;
@@ -65,9 +62,10 @@ $(LIBSYSY): $(OBJS)
 	$(AR) $@ $^
 	$(RANLIB) $@
 
-$(TEST): $(LIBSYSY) $(TEST_SRC)
-	$(CC) $(ADD_LDFLAGS) $(TEST_SRC) -o $@ -I$(SRC_DIR) -L$(BUILD_DIR) -lsysy $(TEST_OPT)
-
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	mkdir -p $(dir $@)
 	$(CC) $^ -o $@ -I$(SRC_DIR) -c $(LIB_OPT)
+
+$(BUILT_TEST_DIR)/%: $(TEST_DIR)/%.c $(LIBSYSY)
+	mkdir -p $(dir $@)
+	$(CC) $(ADD_LDFLAGS) $< -o $@ -I$(SRC_DIR) -L$(BUILD_DIR) -lsysy $(TEST_OPT)
