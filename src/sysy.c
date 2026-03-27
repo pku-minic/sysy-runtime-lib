@@ -167,7 +167,10 @@ void stoptime() {
   gettimeofday(&timer_end, NULL);
 
   // abort if timer_idx is invalid
-  if (timer_idx >= TIMER_COUNT_MAX) abort();
+  if (timer_idx >= TIMER_COUNT_MAX) {
+    put_string_buffered(STDERR_FILENO, "Too many timers\n");
+    abort();
+  }
 
   sysy_timer_t *t = &timers[timer_idx];
   t->us += 1000000 * (timer_end.tv_sec - timer_start.tv_sec) +
