@@ -1,34 +1,17 @@
 #include "nolibc/time.h"
 
 #include "nolibc/sys.h"
+#include "nolibc/types.h"
 
 #ifdef SYS_MACOS
 
-// macOS does not support clock_gettime via syscall,
-// so we use gettimeofday to emulate it.
-
-struct timeval {
-  long tv_sec;
-  long tv_usec;
-};
-
-int clock_gettime(clockid_t clk_id, struct timespec *tp) {
-  // `clk_id` should always be CLOCK_MONOTONIC
-  if (clk_id != CLOCK_MONOTONIC) return -1;
-
-  struct timeval tv;
-  int ret = SYSCALL2(SYS_GETTIMEOFDAY, &tv, 0);
-  if (ret == 0 && tp) {
-    tp->tv_sec = tv.tv_sec;
-    tp->tv_nsec = tv.tv_usec * 1000;
-  }
-  return ret;
-}
+// On macOS, direct raw syscalls are not a reliable path for this API on
+// Apple Silicon. Use libSystem's `clock_gettime` instead.
 
 #elif defined(SYS_RISCV) && defined(SYS_32)
 
 // qemu-riscv32 does not support clock_gettime via syscall,
-// so we use clock_gettime64 instead.
+// so we use `clock_gettime64` instead.
 
 #define SYS_CLOCK_GETTIME64 403
 
