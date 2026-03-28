@@ -6,12 +6,14 @@ Test runner for `sysy-runtime-lib`.
 Scans `test/*.c` files and runs corresponding executables from `build/test`.
 '''
 
+import sys
 import re
 import subprocess
 import argparse
 from pathlib import Path
 import tomllib
 import shlex
+import difflib
 
 
 def parse_args() -> argparse.Namespace:
@@ -37,6 +39,25 @@ class TestResult:
   STDERR_MISMATCH = 'STDERR MISMATCH'
   TIMER_CHECK_FAILED = 'TIMER CHECK FAILED'
   RUNTIME_ERROR = 'RUNTIME ERROR'
+
+
+def make_unified_diff(expected: str, actual: str, expected_name: str,
+                      actual_name: str, indent: str) -> str:
+  '''
+  Builds a unified diff string between expected and actual text.
+  '''
+  diff_lines = difflib.unified_diff(
+      expected.splitlines(),
+      actual.splitlines(),
+      fromfile=expected_name,
+      tofile=actual_name,
+      lineterm=''
+  )
+  if diff_lines:
+    # Add additional indentation for better readability in test output
+    diff_lines = [f'{indent}{line}' for line in diff_lines]
+  diff_text = '\n'.join(diff_lines)
+  return diff_text if diff_text else '(no textual diff)'
 
 
 def strip_timer_lines(stderr: str) -> str:
@@ -148,15 +169,29 @@ def run_single_test(test_name: str, executable: Path, test_dir: Path,
   # Check stdout if expected file exists
   if expected_stdout is not None:
     if actual_stdout != expected_stdout:
+      diff_text = make_unified_diff(
+          expected_stdout,
+          actual_stdout,
+          'expected/stdout',
+          'actual/stdout',
+          '|   ',
+      )
       return (TestResult.STDOUT_MISMATCH,
-              f'stdout differs from expected')
+              f'| stdout differs from expected\n{diff_text}')
 
   # Check stderr if expected file exists (strip timer lines first)
   if expected_stderr is not None:
     stripped_stderr = strip_timer_lines(actual_stderr)
     if stripped_stderr != expected_stderr:
+      diff_text = make_unified_diff(
+          expected_stderr,
+          stripped_stderr,
+          'expected/stderr',
+          'actual/stderr (timer-stripped)',
+          '|   ',
+      )
       return (TestResult.STDERR_MISMATCH,
-              f'stderr differs from expected')
+              f'| stderr differs from expected\n{diff_text}')
 
   # Check timer output if required
   if check_timer:
@@ -190,14 +225,14 @@ def main():
 
   if not test_dir.exists():
     print(f'Error: test directory {test_dir} does not exist')
-    exit(1)
+    sys.exit(1)
 
   # Discover tests
   tests = discover_tests(test_dir)
 
   if not tests:
     print('No tests found')
-    exit(0)
+    sys.exit(0)
 
   # Run tests and collect results
   results = {
@@ -231,7 +266,11 @@ def main():
 
     # Print result
     if detail:
-      print(f'{result} ({detail})')
+      if '\n' in detail:
+        print(result)
+        print(detail)
+      else:
+        print(f'{result} ({detail})')
     else:
       print(result)
 
@@ -257,7 +296,7 @@ def main():
           print(f'    - {test_name}')
 
   # Exit with appropriate code
-  exit(0 if failed == 0 else 1)
+  sys.exit(0 if failed == 0 else 1)
 
 
 if __name__ == '__main__':
