@@ -1,15 +1,23 @@
 #include "nolibc/sys.h"
 #include "nolibc/types.h"
 
-#define SIGABRT 6
-
+#ifndef SYS_MACOS  // macOS always provides a C runtime
 extern int main();
 extern void after_main();
 
-void _start() {
+void __attribute__((noreturn)) _start() {
+#ifdef SYS_X86_64
+  asm volatile(
+      "xor %%rbp, %%rbp\n"  // clear rbp to indicate the end of stack frames
+      "and $-16, %%rsp\n"   // align the stack to 16 bytes
+      :
+      :
+      : "rbp", "rsp");
+#endif  // SYS_X86_64
   int ret = main();
   after_main();
   SYSCALL1(SYS_EXIT, ret);
+  __builtin_unreachable();
 }
 
 void *memset(void *dest, int c, size_t n) {
@@ -24,6 +32,9 @@ void *memcpy(void *dest, const void *src, size_t n) {
   while (n--) *d++ = *s++;
   return dest;
 }
+#endif  // SYS_MACOS
+
+#define SIGABRT 6
 
 void abort() {
   int pid = SYSCALL0(SYS_GETPID);
