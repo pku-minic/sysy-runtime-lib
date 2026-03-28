@@ -68,6 +68,17 @@ def strip_timer_lines(stderr: str) -> str:
   return re.sub(pattern, '', stderr)
 
 
+def strip_qemu_uncaught_signal_lines(stderr: str) -> str:
+  '''
+  Removes qemu-user noise lines that start with
+  `qemu: uncaught target signal`.
+  '''
+  lines = stderr.splitlines(keepends=True)
+  filtered = [line for line in lines
+              if not line.startswith('qemu: uncaught target signal')]
+  return ''.join(filtered)
+
+
 def check_timer_output(stderr: str) -> bool:
   '''
   Checks if stderr's last line contains timer info with at least one non-zero value.
@@ -148,7 +159,7 @@ def run_single_test(test_name: str, executable: Path, test_dir: Path,
     return TestResult.RUNTIME_ERROR, str(e)
 
   actual_stdout = result.stdout
-  actual_stderr = result.stderr
+  actual_stderr = strip_qemu_uncaught_signal_lines(result.stderr)
   actual_exit_code = result.returncode
 
   # Check exit code if specified
