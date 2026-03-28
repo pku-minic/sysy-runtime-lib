@@ -22,9 +22,9 @@ jobs:
       - name: Build (${{ matrix.mode }})
         run: |
           if [ "${{ matrix.mode }}" = "nolibc" ]; then
-            make test AR="ar ru" RANLIB="ranlib" NO_LIBC=1
+            make test AR="ar rc" RANLIB="ranlib" NO_LIBC=1
           else
-            make test AR="ar ru" RANLIB="ranlib"
+            make test AR="ar rc" RANLIB="ranlib"
           fi
       
       - name: Test (${{ matrix.mode }})
@@ -54,9 +54,9 @@ jobs:
           ADD_LDFLAGS: -fuse-ld=lld
         run: |
           if [ "${{ matrix.mode }}" = "nolibc" ]; then
-            make test AR="aarch64-linux-gnu-ar ru" RANLIB="aarch64-linux-gnu-ranlib" NO_LIBC=1
+            make test AR="aarch64-linux-gnu-ar rc" RANLIB="aarch64-linux-gnu-ranlib" NO_LIBC=1
           else
-            make test AR="aarch64-linux-gnu-ar ru" RANLIB="aarch64-linux-gnu-ranlib"
+            make test AR="aarch64-linux-gnu-ar rc" RANLIB="aarch64-linux-gnu-ranlib"
           fi
 
       - name: Test (${{ matrix.mode }})
@@ -88,9 +88,9 @@ jobs:
           ADD_LDFLAGS: -fuse-ld=lld
         run: |
           if [ "${{ matrix.mode }}" = "nolibc" ]; then
-            make test AR="riscv64-linux-gnu-ar ru" RANLIB="riscv64-linux-gnu-ranlib" NO_LIBC=1
+            make test AR="riscv64-linux-gnu-ar rc" RANLIB="riscv64-linux-gnu-ranlib" NO_LIBC=1
           else
-            make test AR="riscv64-linux-gnu-ar ru" RANLIB="riscv64-linux-gnu-ranlib"
+            make test AR="riscv64-linux-gnu-ar rc" RANLIB="riscv64-linux-gnu-ranlib"
           fi
 
       - name: Test (${{ matrix.mode }})
@@ -122,7 +122,7 @@ jobs:
           ADD_LDFLAGS: -fuse-ld=lld
         run: |
           if [ "${{ matrix.mode }}" = "nolibc" ]; then
-            make test AR="riscv64-linux-gnu-ar ru" RANLIB="riscv64-linux-gnu-ranlib" NO_LIBC=1
+            make test AR="riscv64-linux-gnu-ar rc" RANLIB="riscv64-linux-gnu-ranlib" NO_LIBC=1
           else
             echo "Unsupported"
             exit 1
@@ -147,9 +147,9 @@ jobs:
       - name: Build (${{ matrix.mode }})
         run: |
           if [ "${{ matrix.mode }}" = "nolibc" ]; then
-            make test AR="ar ru" RANLIB="ranlib" NO_LIBC=1
+            make test AR="ar rc" RANLIB="ranlib" NO_LIBC=1
           else
-            make test AR="ar ru" RANLIB="ranlib"
+            make test AR="ar rc" RANLIB="ranlib"
           fi
       
       - name: Test (${{ matrix.mode }})
@@ -171,9 +171,9 @@ jobs:
       - name: Build (${{ matrix.mode }})
         run: |
           if [ "${{ matrix.mode }}" = "nolibc" ]; then
-            make test AR="ar ru" RANLIB="ranlib" NO_LIBC=1
+            make test AR="ar rc" RANLIB="ranlib" NO_LIBC=1
           else
-            make test AR="ar ru" RANLIB="ranlib"
+            make test AR="ar rc" RANLIB="ranlib"
           fi
 
       - name: Test (${{ matrix.mode }})

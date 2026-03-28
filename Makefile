@@ -16,7 +16,7 @@ endif
 CC := clang $(CFLAGS) $(ADD_CFLAGS)
 
 # archiver
-ARFLAGS := ru
+ARFLAGS := rc
 AR := llvm-ar $(ARFLAGS)
 
 # ranlib
