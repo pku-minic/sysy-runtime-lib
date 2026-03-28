@@ -1,6 +1,7 @@
 #ifndef LIBSYSY_NOLIBC_TIME_H_
 #define LIBSYSY_NOLIBC_TIME_H_
 
+#include "nolibc/sys.h"
 #include "nolibc/types.h"
 
 #ifdef SYS_MACOS

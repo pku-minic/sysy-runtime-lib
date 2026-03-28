@@ -1,6 +1,8 @@
 #ifndef LIBSYSY_NOLIBC_TYPE_H_
 #define LIBSYSY_NOLIBC_TYPE_H_
 
+#include "nolibc/sys.h"
+
 #ifdef SYS_32
 typedef int ssize_t;
 typedef unsigned int size_t;
